@@ -13,6 +13,8 @@ ChartJsColor::ChartJsColor(const var::String & hex_code){
 		return;
 	}
 
+	set_valid();
+
 	m_red = hex_code
 			.create_sub_string(
 				var::String::Position(0),
@@ -33,7 +35,7 @@ ChartJsColor::ChartJsColor(const var::String & hex_code){
 }
 
 
-var::String ChartJs::convert_type_to_string(enum type value){
+var::String ChartJs::convert_type_to_string(enum types value){
 	switch(value){
 		case type_line: return "line";
 		case type_bar: return "bar";

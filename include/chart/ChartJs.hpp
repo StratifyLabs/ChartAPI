@@ -5,6 +5,43 @@
 
 namespace chart {
 
+class ChartJsFlags {
+public:
+
+	enum positions {
+		position_top,
+		position_left,
+		position_bottom,
+		position_right
+	};
+
+	static var::String position_to_string(enum positions value){
+		switch(value){
+			case position_top: return "top";
+			case position_left: return "left";
+			case position_bottom: return "bottom";
+			case position_right: return "right";
+		}
+		return "left";
+	}
+
+	enum aligns {
+		align_start,
+		align_center,
+		align_end
+	};
+
+	static var::String align_to_string(enum aligns value){
+		switch(value){
+			case align_start: return "start";
+			case align_center: return "center";
+			case align_end: return "end";
+		}
+		return "left";
+	}
+
+};
+
 class ChartJsColor {
 public:
 	ChartJsColor(
@@ -12,25 +49,33 @@ public:
 
 	}
 
+	bool is_valid() const {
+		return m_is_valid;
+	}
+
 	ChartJsColor(const var::String & hex_code);
 
 	ChartJsColor& set_red(u8 value){
 		m_red = value;
+		m_is_valid = true;
 		return *this;
 	}
 
 	ChartJsColor& set_green(u8 value){
 		m_green = value;
+		m_is_valid = true;
 		return *this;
 	}
 
 	ChartJsColor& set_blue(u8 value){
 		m_blue = value;
+		m_is_valid = true;
 		return *this;
 	}
 
 	ChartJsColor& set_alpha(u8 value){
 		m_alpha = value;
+		m_is_valid = true;
 		return *this;
 	}
 
@@ -70,11 +115,13 @@ public:
 
 	static ChartJsColor create_transparent(){
 		return ChartJsColor()
+				.set_valid()
 				.set_alpha(0);
 	}
 
 	static ChartJsColor create_white(){
-		return ChartJsColor();
+		return ChartJsColor()
+				.set_valid();
 	}
 
 	static ChartJsColor create_black(){
@@ -82,6 +129,7 @@ public:
 				.set_red(0)
 				.set_green(0)
 				.set_blue(0)
+				.set_valid()
 				.set_alpha(255);
 	}
 
@@ -90,7 +138,13 @@ public:
 				.set_red(value)
 				.set_green(value)
 				.set_blue(value)
+				.set_valid()
 				.set_alpha(255);
+	}
+
+	static ChartJsColor get_standard(u32 idx){
+		var::Vector<ChartJsColor> palette = create_standard_palette();
+		return palette.at(idx % palette.count());
 	}
 
 	static var::Vector<ChartJsColor> create_standard_palette(){
@@ -116,29 +170,69 @@ public:
 	}
 
 private:
+
+	ChartJsColor& set_valid(bool value = true){
+		m_is_valid = value;
+		return *this;
+	}
 	u8 m_red = 0xff;
 	u8 m_green = 0xff;
 	u8 m_blue = 0xff;
 	u8 m_alpha = 0xff;
+	bool m_is_valid = false;
+};
+
+class ChartJsStringDataPoint {
+public:
+	var::JsonObject to_object() const {
+		return var::JsonObject()
+				.insert("x", var::JsonString(x()))
+				.insert("y", var::JsonString(y()));
+	}
+private:
+	API_AC(ChartJsStringDataPoint,var::String,x);
+	API_AC(ChartJsStringDataPoint,var::String,y);
+
+};
+
+class ChartJsIntegerDataPoint {
+public:
+
+	var::JsonObject to_object() const {
+		return var::JsonObject()
+				.insert("x", var::JsonInteger(x()))
+				.insert("y", var::JsonInteger(y()));
+	}
+private:
+	API_AF(ChartJsIntegerDataPoint,int,x,0);
+	API_AF(ChartJsIntegerDataPoint,int,y,0);
+
+};
+
+class ChartJsRealDataPoint {
+public:
+
+	var::JsonObject to_object() const {
+		return var::JsonObject()
+				.insert("x", var::JsonReal(x()))
+				.insert("y", var::JsonReal(y()));
+	}
+private:
+	API_AF(ChartJsRealDataPoint,float,x,0.0f);
+	API_AF(ChartJsRealDataPoint,float,y,0.0f);
+
 };
 
 class ChartJsDataSet {
 public:
 	ChartJsDataSet(){}
 
-	enum type {
+	enum types {
 		type_string,
 		type_real,
 		type_object
 	};
 
-	ChartJsDataSet& set_property(
-			const var::String & key,
-			const var::JsonValue & value
-			){
-		m_properties.insert(key, value);
-		return *this;
-	}
 
 	ChartJsDataSet& append(const var::JsonValue & value){
 		data().push_back(value);
@@ -148,6 +242,19 @@ public:
 	var::JsonObject to_object() const {
 		var::JsonObject result;
 		result.copy(m_properties);
+		if( background_color().is_valid() ){
+			result.insert("backgroundColor", var::JsonString(background_color().to_string()));
+		}
+
+		if( border_color().is_valid() ){
+			result.insert("borderColor", var::JsonString(border_color().to_string()));
+		}
+
+		if( !label().is_empty() ){
+			result.insert("label", var::JsonString(label()));
+		}
+
+
 		var::JsonArray data_array;
 		for(const auto & data: m_data){
 			data_array.append(data);
@@ -165,7 +272,10 @@ public:
 
 
 private:
-	enum type m_type = type_string;
+	API_AC(ChartJsDataSet,var::String,label);
+	API_AC(ChartJsDataSet,ChartJsColor,background_color);
+	API_AC(ChartJsDataSet,ChartJsColor,border_color);
+	enum types m_type = type_string;
 	var::JsonObject m_properties;
 	var::Vector<var::JsonValue> m_data;
 };
@@ -205,6 +315,179 @@ private:
 	var::Vector<ChartJsDataSet> m_dataset_list;
 };
 
+class ChartJsAxisTicks {
+public:
+
+	bool is_valid() const {
+		return minimum() != maximum();
+	}
+
+	var::JsonObject to_object() const {
+		if( is_valid() ){
+			return var::JsonObject()
+					.insert("stepSize", var::JsonReal(step_size()))
+					.insert("min", var::JsonReal(minimum()))
+					.insert("max", var::JsonInteger(maximum()));
+		}
+
+		return var::JsonObject();
+	}
+
+private:
+	API_AF(ChartJsAxisTicks,float,minimum,0);
+	API_AF(ChartJsAxisTicks,float,maximum,0);
+	API_AF(ChartJsAxisTicks,float,step_size,0);
+};
+
+class ChartJsScaleLabel {
+public:
+
+	bool is_valid() const {
+		return !label().is_empty();
+	}
+
+	var::JsonObject to_object() const {
+		return var::JsonObject()
+				.insert("display", is_display())
+				.insert("labelString", var::JsonString(label()));
+	}
+
+private:
+	API_AB(ChartJsScaleLabel,display,true);
+	API_AC(ChartJsScaleLabel,var::String,label);
+};
+
+class ChartJsAxis {
+public:
+
+	enum types {
+		type_linear,
+		type_logarithmic,
+		type_category,
+		type_time
+	};
+
+	var::JsonObject to_object() const {
+		var::JsonObject result;
+		result.insert("display", is_display())
+				.insert("type", var::JsonString(type_to_string(type())))
+				.insert("weight", var::JsonInteger(weight()));
+
+		if( ticks().is_valid() ){
+			result.insert("ticks", ticks().to_object());
+		}
+
+		if( scale_label().is_valid() ){
+			result.insert("scaleLabel", scale_label().to_object());
+		}
+
+		return result;
+	}
+
+private:
+	API_AB(ChartJsAxis,display,true);
+	API_AF(ChartJsAxis,int,weight,0);
+	API_AC(ChartJsAxis,ChartJsAxisTicks,ticks);
+	API_AC(ChartJsAxis,ChartJsScaleLabel,scale_label);
+	API_AC(ChartJsAxis,var::String,id);
+	API_AC(ChartJsAxis,enum types,type);
+
+	static var::String type_to_string(enum types value){
+		switch(value){
+			case type_linear: return "linear";
+			case type_logarithmic: return "logarithmic";
+			case type_category: return "category";
+			case type_time: return "time";
+		}
+		return "linear";
+	}
+};
+
+class ChartJsScales {
+public:
+
+	ChartJsScales& append_x_axis(const ChartJsAxis & axis){
+		x_axes().push_back(axis);
+		return *this;
+	}
+
+	ChartJsScales& append_y_axis(const ChartJsAxis & axis){
+		y_axes().push_back(axis);
+		return *this;
+	}
+
+	var::JsonObject to_object() const {
+		var::JsonObject result;
+
+		if( x_axes().count() > 0 ){
+			result.insert("xAxes", axes_to_array(x_axes()));
+		}
+
+		if( y_axes().count() > 0 ){
+			result.insert("yAxes", axes_to_array(y_axes()));
+		}
+
+		return result;
+	}
+
+private:
+	API_AC(ChartJsScales,var::Vector<ChartJsAxis>,x_axes);
+	API_AC(ChartJsScales,var::Vector<ChartJsAxis>,y_axes);
+
+	var::JsonArray axes_to_array(const var::Vector<ChartJsAxis> & axes) const {
+		var::JsonArray result;
+		for(const auto & axis: axes){
+			result.append(axis.to_object());
+		}
+		return result;
+	}
+};
+
+class ChartJsTitle: public ChartJsFlags {
+public:
+
+
+
+	var::JsonObject to_object() const {
+		return var::JsonObject()
+				.insert("display", is_display())
+				.insert("fontSize", var::JsonInteger(font_size()))
+				.insert("position", var::JsonString(position_to_string(position())))
+				.insert("text", var::JsonString(text()));
+	}
+
+private:
+	API_AB(ChartJsTitle,display,true);
+	API_AF(ChartJsTitle,enum positions,position,position_top);
+	API_AF(ChartJsTitle,int,font_size,12);
+	API_AC(ChartJsTitle,var::String,text);
+
+};
+
+class ChartJsLegend: public ChartJsFlags {
+public:
+
+	var::JsonObject to_object() const {
+		return var::JsonObject()
+				.insert("align", var::JsonString(align_to_string(align())))
+				.insert("position", var::JsonString(position_to_string(position())))
+				.insert("display", is_display())
+				.insert("rtl", is_right_to_left())
+				.insert("reverse", is_reverse())
+				.insert("fullWidth", is_full_width());
+	}
+
+private:
+	API_AB(ChartJsLegend,display,true);
+	API_AB(ChartJsLegend,full_width,true);
+	API_AB(ChartJsLegend,reverse,false);
+	API_AB(ChartJsLegend,right_to_left,false);
+	API_AF(ChartJsLegend,enum positions,position,position_top);
+	API_AF(ChartJsLegend,enum aligns,align,align_center);
+
+};
+
+
 class ChartJsOptions {
 public:
 	ChartJsOptions(){}
@@ -222,87 +505,33 @@ public:
 		return *this;
 	}
 
-
-	ChartJsOptions& set_y_axes(
-			const var::JsonArray & array
-			){
-		var::JsonObject scales_object = m_value.at("scales").to_object();
-		scales_object.insert("yAxes", array);
-		m_value.insert("scales", scales_object);
+	ChartJsOptions& set_scales(const ChartJsScales & value){
+		m_value.insert("scales", value.to_object());
 		return *this;
 	}
 
-	ChartJsOptions& set_x_axes(
-			const var::JsonArray & array
-			){
-		var::JsonObject scales_object = m_value.at("scales").to_object();
-		scales_object.insert("xAxes", array);
-		m_value.insert("scales", scales_object);
+	ChartJsOptions& set_legend(const ChartJsLegend & value){
+		m_value.insert("legend", value.to_object());
 		return *this;
 	}
 
-	ChartJsOptions& set_y_axis(
-			const var::JsonObject & object
-			){
-		var::JsonArray array;
-		array.append(object);
-		set_y_axes(array);
+	ChartJsOptions& set_title(const ChartJsTitle & value){
+		m_value.insert("title", value.to_object());
 		return *this;
 	}
 
-	ChartJsOptions& set_x_axis(
-			const var::JsonObject & object
-			){
-		var::JsonArray array;
-		array.append(object);
-		set_x_axes(array);
-		return *this;
-	}
-
-	static var::JsonObject create_title(const var::String & text){
-		var::JsonObject result;
-		result.insert("display", var::JsonTrue());
-		result.insert("text", var::JsonString(text));
+	static ChartJsOptions create_time(const var::String & unit, const var::String & format){
+		ChartJsOptions result;
+		result.set_property("unit", var::JsonString(unit));
+		ChartJsOptions display_format;
+		display_format.set_property(unit, var::JsonString(format));
+		result.set_property("displayFormats", display_format.object());
 		return result;
 	}
 
-	static var::JsonObject create_axis(const var::String & type){
-		var::JsonObject result;
-		result.insert("display", var::JsonTrue());
-		if( type.is_empty() == false ){
-			result.insert("type", var::JsonString(type));
-		}
-		return result;
+	const var::JsonObject & object(){
+		return m_value;
 	}
-
-	static var::JsonObject create_scale_label(const var::String & label){
-		var::JsonObject result;
-		result.insert("display", var::JsonTrue());
-		result.insert("labelString", var::JsonString(label));
-		return result;
-	}
-
-	static var::JsonObject create_legend(bool is_display){
-		var::JsonObject result;
-		if( is_display ){
-			result.insert("display", var::JsonTrue());
-		} else {
-			result.insert("display", var::JsonFalse());
-		}
-		return result;
-	}
-
-	static var::JsonObject create_time(const var::String & unit, const var::String & format){
-		var::JsonObject result;
-		result.insert("unit", var::JsonString(unit));
-		var::JsonObject display_format;
-		display_format.insert(unit, var::JsonString(format));
-		result.insert("displayFormats", display_format);
-		return result;
-	}
-
-
-
 
 private:
 	var::JsonObject m_value;
@@ -314,7 +543,7 @@ class ChartJs {
 public:
 	ChartJs();
 
-	enum type {
+	enum types {
 		type_line,
 		type_bar,
 		type_doughnut,
@@ -323,16 +552,12 @@ public:
 		type_scatter
 	};
 
-	ChartJs& set_type(enum type value){
-		m_type = value;
-		return *this;
-	}
-
 	var::JsonObject to_object() const {
 		var::JsonObject result;
-		result.insert("type",
-									var::JsonString( convert_type_to_string(m_type) )
-									);
+		result.insert(
+					"type",
+					var::JsonString( convert_type_to_string(m_type) )
+					);
 
 		result.insert(
 					"options",
@@ -354,11 +579,12 @@ public:
 	const ChartJsOptions& options() const { return m_options; }
 
 private:
-	enum type m_type;
+	API_AF(ChartJs, enum types, type, type_line);
+
 	ChartJsData m_data;
 	ChartJsOptions m_options;
 
-	static var::String convert_type_to_string(enum type value);
+	static var::String convert_type_to_string(enum types value);
 
 };
 
