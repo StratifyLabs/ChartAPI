@@ -233,51 +233,104 @@ public:
 		type_object
 	};
 
+	enum point_styles {
+		point_style_circle,
+		point_style_cross,
+		point_style_cross_rot,
+		point_style_dash,
+		point_style_line,
+		point_style_rectangle,
+		point_style_rectangle_rounded,
+		point_style_rectangle_rot,
+		point_style_star,
+		point_style_triangle
+	};
+
+	enum cubic_interpolation_modes {
+		cubic_interpolation_mode_default,
+		cubic_interpolation_mode_monotone
+	};
+
+	enum stepped_lines {
+		stepped_line_true,
+		stepped_line_false,
+		stepped_line_before,
+		stepped_line_after,
+		stepped_line_middle
+	};
+
+	enum border_join_styles {
+		border_join_style_undefined,
+		border_join_style_bevel,
+		border_join_style_round,
+		border_join_style_miter
+	};
+
+	enum border_cap_styles {
+		border_cap_style_butt,
+		border_cap_style_round,
+		border_cap_style_square
+	};
+
 
 	ChartJsDataSet& append(const var::JsonValue & value){
 		data().push_back(value);
 		return *this;
 	}
 
-	var::JsonObject to_object() const {
-		var::JsonObject result;
-		result.copy(m_properties);
-		if( background_color().is_valid() ){
-			result.insert("backgroundColor", var::JsonString(background_color().to_string()));
-		}
-
-		if( border_color().is_valid() ){
-			result.insert("borderColor", var::JsonString(border_color().to_string()));
-		}
-
-		if( !label().is_empty() ){
-			result.insert("label", var::JsonString(label()));
-		}
-
-
-		var::JsonArray data_array;
-		for(const auto & data: m_data){
-			data_array.append(data);
-		}
-		result.insert(
-					"data",
-					data_array
-					);
-
-		return result;
-	}
+	var::JsonObject to_object() const;
 
 	var::Vector<var::JsonValue>& data(){ return m_data; }
 	const var::Vector<var::JsonValue>& data() const { return m_data; }
 
 
 private:
-	API_AC(ChartJsDataSet,var::String,label);
+
 	API_AC(ChartJsDataSet,ChartJsColor,background_color);
+	API_AF(ChartJsDataSet,enum border_cap_styles,border_cap_style,border_cap_style_butt);
 	API_AC(ChartJsDataSet,ChartJsColor,border_color);
+	API_AC(ChartJsDataSet,var::Vector<s32>,border_dash_list);
+	API_AF(ChartJsDataSet,float,border_dash_offset,0.0f);
+	API_AF(ChartJsDataSet,enum border_join_styles,border_join_style,border_join_style_miter);
+	API_AF(ChartJsDataSet,float,border_width,3.0f);
+	API_AF(ChartJsDataSet,enum cubic_interpolation_modes,cubic_interpolation_mode,cubic_interpolation_mode_default);
+	API_AB(ChartJsDataSet,fill,true);
+	//clip
+	API_AC(ChartJsDataSet,ChartJsColor,hover_background_color);
+	API_AF(ChartJsDataSet,enum border_cap_styles,hover_border_cap_style,border_cap_style_butt);
+	API_AC(ChartJsDataSet,ChartJsColor,hover_border_color);
+	API_AC(ChartJsDataSet,var::Vector<s32>,hover_border_dash_list);
+	API_AF(ChartJsDataSet,float,hover_border_dash_offset,0.0f);
+	API_AF(ChartJsDataSet,enum border_join_styles,hover_border_join_style,border_join_style_undefined);
+	API_AF(ChartJsDataSet,float,hover_border_width,HUGE_VALF);
+	API_AC(ChartJsDataSet,var::String,label);
+	API_AF(ChartJsDataSet,float,line_tension,0.4f);
+	API_AF(ChartJsDataSet,int,order,0);
+	API_AC(ChartJsDataSet,ChartJsColor,point_background_color);
+	API_AC(ChartJsDataSet,ChartJsColor,point_border_color);
+	API_AF(ChartJsDataSet,float,point_border_width,1.0f);
+	API_AF(ChartJsDataSet,float,point_hit_radius,1.0f);
+	API_AC(ChartJsDataSet,ChartJsColor,point_hover_background_color);
+	API_AC(ChartJsDataSet,ChartJsColor,point_hover_border_color);
+	API_AF(ChartJsDataSet,float,point_hover_border_width,1.0f);
+	API_AF(ChartJsDataSet,float,point_hover_radius,4.0f);
+	API_AF(ChartJsDataSet,float,point_radius,3.0f);
+	API_AF(ChartJsDataSet,float,point_rotation,0.0f);
+	API_AF(ChartJsDataSet,enum point_styles,point_style,point_style_circle);
+	API_AB(ChartJsDataSet,show_line,true);
+	API_AB(ChartJsDataSet,span_gaps,true);
+	API_AF(ChartJsDataSet,enum stepped_lines,stepped_line,stepped_line_false);
+	API_AC(ChartJsDataSet,var::String,x_axis_id);
+	API_AC(ChartJsDataSet,var::String,y_axis_id);
+
 	enum types m_type = type_string;
-	var::JsonObject m_properties;
 	var::Vector<var::JsonValue> m_data;
+
+	static var::String get_point_style_string(enum point_styles value);
+	static var::String get_cubic_interpolation_mode_string(enum cubic_interpolation_modes value);
+	static var::String get_stepped_line_string(enum stepped_lines value);
+	static var::String get_border_join_style_string(enum border_join_styles value);
+	static var::String get_border_cap_style_string(enum border_cap_styles value);
 };
 
 class ChartJsData {
@@ -381,6 +434,10 @@ public:
 			result.insert("scaleLabel", scale_label().to_object());
 		}
 
+		if( is_stacked() ){
+			result.insert("stacked", is_stacked());
+		}
+
 		return result;
 	}
 
@@ -390,6 +447,7 @@ private:
 	API_AC(ChartJsAxis,ChartJsAxisTicks,ticks);
 	API_AC(ChartJsAxis,ChartJsScaleLabel,scale_label);
 	API_AC(ChartJsAxis,var::String,id);
+	API_AB(ChartJsAxis,stacked,false);
 	API_AC(ChartJsAxis,enum types,type);
 
 	static var::String type_to_string(enum types value){
@@ -549,7 +607,7 @@ public:
 		type_doughnut,
 		type_pie,
 		type_radar,
-		type_scatter
+		type_scatter,
 	};
 
 	var::JsonObject to_object() const {
