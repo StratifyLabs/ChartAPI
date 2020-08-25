@@ -1,6 +1,7 @@
 #ifndef CHARTJS_HPP
 #define CHARTJS_HPP
 
+#include <cmath>
 #include <sapi/var/Json.hpp>
 
 namespace chart {
