@@ -1,6 +1,7 @@
 
 
 set(SOURCES
-	ChartJs.cpp
+	chart/ChartJs.hpp
+	chart.hpp
 	PARENT_SCOPE
 	)
