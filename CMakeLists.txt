@@ -8,14 +8,15 @@ set(CMAKE_MODULE_PATH ${SOS_SDK_PATH}/Tools/gcc/cmake)
 set(CMAKE_TOOLCHAIN_FILE ${CMAKE_MODULE_PATH}/sos-toolchain.cmake)
 include(sos-sdk)
 
+include(targets/JsonAPI)
+
 set(LOCAL_NAME ChartAPI)
 project(${LOCAL_NAME} CXX)
 
-sos_sdk_add_subdirectory(PRIVATE_SOURCES ${CMAKE_SOURCE_DIR}/src)
-sos_sdk_add_subdirectory(INTERFACE_SOURCES ${CMAKE_SOURCE_DIR}/include)
+sos_sdk_add_subdirectory(PRIVATE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src)
+sos_sdk_add_subdirectory(INTERFACE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-include(targets/API_release_v7m)
-include(targets/VarAPI_release_v7m)
+
 
 sos_sdk_library_target(RELEASE ${LOCAL_NAME} "" release ${SOS_ARCH})
 
@@ -44,29 +45,24 @@ target_compile_options(${RELEASE_TARGET}
 target_include_directories(${RELEASE_TARGET}
 	PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-	$<INSTALL_INTERFACE:include/ChartAPI>
+	$<INSTALL_INTERFACE:include/${LOCAL_NAME}>
 	PRIVATE
 	)
 
 
-target_link_libraries(${RELEASE_TARGET}
-	PUBLIC
-	VarAPI_release_v7m
-	)
+set(LIBRARIES JsonAPI)
+
+
+install(DIRECTORY include/ DESTINATION include/${LOCAL_NAME} PATTERN CMakelists.txt EXCLUDE)
 
 option(BUILD_DEBUG "Build debug version of library" OFF)
 if(BUILD_DEBUG)
 sos_sdk_library_target(DEBUG ${LOCAL_NAME} "${LIB_OPTION}" debug ${SOS_ARCH})
 add_library(${DEBUG_TARGET} STATIC)
 sos_sdk_copy_target(${RELEASE_TARGET} ${DEBUG_TARGET})
-sos_sdk_library_add_arch_targets("${DEBUG_OPTIONS}" ${SOS_ARCH})
+sos_sdk_library_add_arch_targets("${DEBUG_OPTIONS}" ${SOS_ARCH} "${LIBRARIES}")
 endif()
 
-sos_sdk_library("${RELEASE_OPTIONS}")
-#sos_sdk_library_add_arch_targets("${RELEASE_OPTIONS}" ${SOS_ARCH} VarAPI_release)
-
-
-
-#/Users/tgil/StratifyLabs/SDK/GCC8/StratifyLabs-SDK/Tools/gcc/bin/arm-none-eabi-g++  -DMCU_SOS_GIT_HASH=9dc45b5 -D__SOS_SDK_OPTION_EMPTY -D__StratifyOS__ -D___release -D__v7m -I/Users/tgil/gitv4/ChartAPI/include -I/Users/tgil/StratifyLabs/SDK/GCC8/StratifyLabs-SDK/Tools/gcc/arm-none-eabi/include/API -I/Users/tgil/StratifyLabs/SDK/GCC8/StratifyLabs-SDK/Tools/gcc/arm-none-eabi/include/VarAPI  -fno-exceptions -fno-unwind-tables -fno-rtti   -Os -mthumb -ffunction-sections -fdata-sections -fomit-frame-pointer -march=armv7-m -DARM_MATH_CM3=1 -std=gnu++17 -o CMakeFiles/ChartAPI_release_v7m.dir/src/ChartJs.cpp.obj -c /Users/tgil/gitv4/ChartAPI/src/ChartJs.cpp
-#/Users/tgil/StratifyLabs/SDK/GCC8/StratifyLabs-SDK/Tools/gcc/bin/arm-none-eabi-g++  -DMCU_SOS_GIT_HASH=9dc45b5 -D__SOS_SDK_OPTION_EMPTY -D__StratifyOS__ -D___release -D__v7m -I/Users/tgil/gitv4/ChartAPI/include -I/Users/tgil/StratifyLabs/SDK/GCC8/StratifyLabs-SDK/Tools/gcc/arm-none-eabi/include/API -I/Users/tgil/StratifyLabs/SDK/GCC8/StratifyLabs-SDK/Tools/gcc/arm-none-eabi/include/VarAPI  -fno-exceptions -fno-unwind-tables -fno-rtti   -Os -mthumb -ffunction-sections -fdata-sections -fomit-frame-pointer -march=armv7-m -DARM_MATH_CM3=1 -std=gnu++17 -o CMakeFiles/ChartAPI_release_v7m.dir/src/ChartJs.cpp.obj -c /Users/tgil/gitv4/ChartAPI/src/ChartJs.cpp
+#sos_sdk_library("${RELEASE_OPTIONS}")
+sos_sdk_library_add_arch_targets("${RELEASE_OPTIONS}" ${SOS_ARCH} "${LIBRARIES}")
 

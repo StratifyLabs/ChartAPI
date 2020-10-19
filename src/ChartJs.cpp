@@ -128,102 +128,103 @@ ChartJsDataSet::get_border_cap_style_string(enum border_cap_styles value) {
   return "butt";
 }
 
-var::JsonObject ChartJsDataSet::to_object() const {
-  var::JsonObject result;
+json::JsonObject ChartJsDataSet::to_object() const {
+  json::JsonObject result;
 
   if (background_color().is_valid()) {
     result.insert("backgroundColor",
-                  var::JsonString(background_color().to_string()));
+                  json::JsonString(background_color().to_string()));
   }
 
-  result.insert("borderCapStyle", var::JsonString(get_border_cap_style_string(
+  result.insert("borderCapStyle", json::JsonString(get_border_cap_style_string(
                                       border_cap_style())));
 
   if (border_color().is_valid()) {
-    result.insert("borderColor", var::JsonString(border_color().to_string()));
+    result.insert("borderColor", json::JsonString(border_color().to_string()));
   }
 
   if (border_dash_list().count()) {
-    result.insert("borderDash", var::JsonArray(border_dash_list()));
+    result.insert("borderDash", json::JsonArray(border_dash_list()));
   }
 
-  result.insert("borderDashOffset", var::JsonReal(border_dash_offset()));
-  result.insert("borderJoinStyle", var::JsonString(get_border_join_style_string(
-                                       border_join_style())));
-  result.insert("borderWidth", var::JsonReal(border_width()));
+  result.insert("borderDashOffset", json::JsonReal(border_dash_offset()));
+  result.insert(
+      "borderJoinStyle",
+      json::JsonString(get_border_join_style_string(border_join_style())));
+  result.insert("borderWidth", json::JsonReal(border_width()));
   result.insert("cubicInterpolationMode",
-                var::JsonString(get_cubic_interpolation_mode_string(
+                json::JsonString(get_cubic_interpolation_mode_string(
                     cubic_interpolation_mode())));
   // clip
   result.insert("fill", is_fill());
 
   if (hover_background_color().is_valid()) {
     result.insert("hoverBackgroundColor",
-                  var::JsonString(hover_background_color().to_string()));
+                  json::JsonString(hover_background_color().to_string()));
   }
   result.insert(
       "hoverBorderCapStyle",
-      var::JsonString(get_border_cap_style_string(hover_border_cap_style())));
+      json::JsonString(get_border_cap_style_string(hover_border_cap_style())));
 
   if (hover_border_color().is_valid()) {
     result.insert("hoverBorderColor",
-                  var::JsonString(hover_border_color().to_string()));
+                  json::JsonString(hover_border_color().to_string()));
   }
 
   if (hover_border_dash_list().count()) {
-    result.insert("hoverBorderDash", var::JsonArray(hover_border_dash_list()));
+    result.insert("hoverBorderDash", json::JsonArray(hover_border_dash_list()));
   }
 
   if (hover_border_dash_offset() != HUGE_VALF) {
     result.insert("hoverBorderDashOffset",
-                  var::JsonReal(hover_border_dash_offset()));
+                  json::JsonReal(hover_border_dash_offset()));
   }
 
   if (hover_border_join_style() != border_join_style_undefined) {
     result.insert("hoverBorderJoinStyle",
-                  var::JsonString(
+                  json::JsonString(
                       get_border_join_style_string(hover_border_join_style())));
   }
 
   if (hover_border_width() != HUGE_VALF) {
-    result.insert("hoverBorderWidth", var::JsonReal(hover_border_width()));
+    result.insert("hoverBorderWidth", json::JsonReal(hover_border_width()));
   }
 
   if (!label().is_empty()) {
-    result.insert("label", var::JsonString(label()));
+    result.insert("label", json::JsonString(label()));
   }
 
-  result.insert("lineTension", var::JsonReal(line_tension()));
-  result.insert("order", var::JsonInteger(order()));
+  result.insert("lineTension", json::JsonReal(line_tension()));
+  result.insert("order", json::JsonInteger(order()));
 
   if (point_background_color().is_valid()) {
     result.insert("pointBackgroundColor",
-                  var::JsonString(point_background_color().to_string()));
+                  json::JsonString(point_background_color().to_string()));
   }
 
   if (point_border_color().is_valid()) {
     result.insert("pointBorderColor",
-                  var::JsonString(point_border_color().to_string()));
+                  json::JsonString(point_border_color().to_string()));
   }
 
-  result.insert("pointBorderWidth", var::JsonReal(point_border_width()));
-  result.insert("pointHitRadius", var::JsonReal(point_hit_radius()));
+  result.insert("pointBorderWidth", json::JsonReal(point_border_width()));
+  result.insert("pointHitRadius", json::JsonReal(point_hit_radius()));
 
   if (point_hover_background_color().is_valid()) {
     result.insert("pointHoverBackgroundColor",
-                  var::JsonString(point_hover_background_color().to_string()));
+                  json::JsonString(point_hover_background_color().to_string()));
   }
 
   if (point_hover_border_color().is_valid()) {
     result.insert("pointHoverBorderColor",
-                  var::JsonString(point_hover_border_color().to_string()));
+                  json::JsonString(point_hover_border_color().to_string()));
   }
 
-  result.insert("pointHoverRadius", var::JsonReal(point_hover_radius()));
-  result.insert("pointRadius", var::JsonReal(point_radius()));
-  result.insert("pointRotation", var::JsonReal(point_rotation()));
+  result.insert("pointHoverRadius", json::JsonReal(point_hover_radius()));
+  result.insert("pointRadius", json::JsonReal(point_radius()));
+  result.insert("pointRotation", json::JsonReal(point_rotation()));
   result.insert("pointStyle",
-                var::JsonString(get_point_style_string(point_style())));
+                json::JsonString(get_point_style_string(point_style())));
 
   result.insert("showLine", is_show_line());
   result.insert("spanGaps", is_span_gaps());
@@ -236,19 +237,19 @@ var::JsonObject ChartJsDataSet::to_object() const {
     } else if (stepped_line_value == "false") {
       result.insert("steppedLine", false);
     } else {
-      result.insert("steppedLine", var::JsonString(stepped_line_value));
+      result.insert("steppedLine", json::JsonString(stepped_line_value));
     }
   }
 
   if (!x_axis_id().is_empty()) {
-    result.insert("xAxisID", var::JsonString(x_axis_id()));
+    result.insert("xAxisID", json::JsonString(x_axis_id()));
   }
 
   if (!y_axis_id().is_empty()) {
-    result.insert("xAxisID", var::JsonString(y_axis_id()));
+    result.insert("xAxisID", json::JsonString(y_axis_id()));
   }
 
-  var::JsonArray data_array;
+  json::JsonArray data_array;
   for (const auto &data : m_data) {
     data_array.append(data);
   }

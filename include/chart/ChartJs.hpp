@@ -4,7 +4,7 @@
 #include <cmath>
 
 #include <api/api.hpp>
-#include <var/Json.hpp>
+#include <json/Json.hpp>
 
 namespace chart {
 
@@ -152,10 +152,10 @@ private:
 
 class ChartJsStringDataPoint {
 public:
-  var::JsonObject to_object() const {
-    return var::JsonObject()
-        .insert("x", var::JsonString(x()))
-        .insert("y", var::JsonString(y()));
+  json::JsonObject to_object() const {
+    return json::JsonObject()
+        .insert("x", json::JsonString(x()))
+        .insert("y", json::JsonString(y()));
   }
 
 private:
@@ -165,10 +165,10 @@ private:
 
 class ChartJsIntegerDataPoint {
 public:
-  var::JsonObject to_object() const {
-    return var::JsonObject()
-        .insert("x", var::JsonInteger(x()))
-        .insert("y", var::JsonInteger(y()));
+  json::JsonObject to_object() const {
+    return json::JsonObject()
+        .insert("x", json::JsonInteger(x()))
+        .insert("y", json::JsonInteger(y()));
   }
 
 private:
@@ -178,10 +178,10 @@ private:
 
 class ChartJsRealDataPoint {
 public:
-  var::JsonObject to_object() const {
-    return var::JsonObject()
-        .insert("x", var::JsonReal(x()))
-        .insert("y", var::JsonReal(y()));
+  json::JsonObject to_object() const {
+    return json::JsonObject()
+        .insert("x", json::JsonReal(x()))
+        .insert("y", json::JsonReal(y()));
   }
 
 private:
@@ -234,15 +234,15 @@ public:
     border_cap_style_square
   };
 
-  ChartJsDataSet &append(const var::JsonValue &value) {
+  ChartJsDataSet &append(const json::JsonValue &value) {
     data().push_back(value);
     return *this;
   }
 
-  var::JsonObject to_object() const;
+  json::JsonObject to_object() const;
 
-  var::Vector<var::JsonValue> &data() { return m_data; }
-  const var::Vector<var::JsonValue> &data() const { return m_data; }
+  var::Vector<json::JsonValue> &data() { return m_data; }
+  const var::Vector<json::JsonValue> &data() const { return m_data; }
 
 private:
   API_AC(ChartJsDataSet, ChartJsColor, background_color);
@@ -288,7 +288,7 @@ private:
   API_AC(ChartJsDataSet, var::String, y_axis_id);
 
   enum types m_type = type_string;
-  var::Vector<var::JsonValue> m_data;
+  var::Vector<json::JsonValue> m_data;
 
   static var::StringView get_point_style_string(enum point_styles value);
   static var::StringView
@@ -309,10 +309,10 @@ public:
     return *this;
   }
 
-  var::JsonObject to_object() const {
-    var::JsonObject result;
-    result.insert("labels", var::JsonArray(m_label_list));
-    var::JsonArray dataset_array;
+  json::JsonObject to_object() const {
+    json::JsonObject result;
+    result.insert("labels", json::JsonArray(m_label_list));
+    json::JsonArray dataset_array;
     for (const auto &dataset : m_dataset_list) {
       dataset_array.append(dataset.to_object());
     }
@@ -332,15 +332,15 @@ class ChartJsAxisTicks {
 public:
   bool is_valid() const { return minimum() != maximum(); }
 
-  var::JsonObject to_object() const {
+  json::JsonObject to_object() const {
     if (is_valid()) {
-      return var::JsonObject()
-          .insert("stepSize", var::JsonReal(step_size()))
-          .insert("min", var::JsonReal(minimum()))
-          .insert("max", var::JsonInteger(maximum()));
+      return json::JsonObject()
+          .insert("stepSize", json::JsonReal(step_size()))
+          .insert("min", json::JsonReal(minimum()))
+          .insert("max", json::JsonInteger(maximum()));
     }
 
-    return var::JsonObject();
+    return json::JsonObject();
   }
 
 private:
@@ -353,10 +353,10 @@ class ChartJsScaleLabel {
 public:
   bool is_valid() const { return !label().is_empty(); }
 
-  var::JsonObject to_object() const {
-    return var::JsonObject()
+  json::JsonObject to_object() const {
+    return json::JsonObject()
         .insert("display", is_display())
-        .insert("labelString", var::JsonString(label()));
+        .insert("labelString", json::JsonString(label()));
   }
 
 private:
@@ -368,11 +368,11 @@ class ChartJsAxis {
 public:
   enum types { type_linear, type_logarithmic, type_category, type_time };
 
-  var::JsonObject to_object() const {
-    var::JsonObject result;
+  json::JsonObject to_object() const {
+    json::JsonObject result;
     result.insert("display", is_display())
-        .insert("type", var::JsonString(type_to_string(type())))
-        .insert("weight", var::JsonInteger(weight()));
+        .insert("type", json::JsonString(type_to_string(type())))
+        .insert("weight", json::JsonInteger(weight()));
 
     if (ticks().is_valid()) {
       result.insert("ticks", ticks().to_object());
@@ -425,8 +425,8 @@ public:
     return *this;
   }
 
-  var::JsonObject to_object() const {
-    var::JsonObject result;
+  json::JsonObject to_object() const {
+    json::JsonObject result;
 
     if (x_axes().count() > 0) {
       result.insert("xAxes", axes_to_array(x_axes()));
@@ -443,8 +443,8 @@ private:
   API_AC(ChartJsScales, var::Vector<ChartJsAxis>, x_axes);
   API_AC(ChartJsScales, var::Vector<ChartJsAxis>, y_axes);
 
-  var::JsonArray axes_to_array(const var::Vector<ChartJsAxis> &axes) const {
-    var::JsonArray result;
+  json::JsonArray axes_to_array(const var::Vector<ChartJsAxis> &axes) const {
+    json::JsonArray result;
     for (const auto &axis : axes) {
       result.append(axis.to_object());
     }
@@ -454,12 +454,12 @@ private:
 
 class ChartJsTitle : public ChartJsFlags {
 public:
-  var::JsonObject to_object() const {
-    return var::JsonObject()
+  json::JsonObject to_object() const {
+    return json::JsonObject()
         .insert("display", is_display())
-        .insert("fontSize", var::JsonInteger(font_size()))
-        .insert("position", var::JsonString(position_to_string(position())))
-        .insert("text", var::JsonString(text()));
+        .insert("fontSize", json::JsonInteger(font_size()))
+        .insert("position", json::JsonString(position_to_string(position())))
+        .insert("text", json::JsonString(text()));
   }
 
 private:
@@ -471,10 +471,10 @@ private:
 
 class ChartJsLegend : public ChartJsFlags {
 public:
-  var::JsonObject to_object() const {
-    return var::JsonObject()
-        .insert("align", var::JsonString(align_to_string(align())))
-        .insert("position", var::JsonString(position_to_string(position())))
+  json::JsonObject to_object() const {
+    return json::JsonObject()
+        .insert("align", json::JsonString(align_to_string(align())))
+        .insert("position", json::JsonString(position_to_string(position())))
         .insert("display", is_display())
         .insert("rtl", is_right_to_left())
         .insert("reverse", is_reverse())
@@ -493,14 +493,13 @@ private:
 class ChartJsOptions {
 public:
   ChartJsOptions() {}
-  var::JsonObject to_object() const {
-    var::JsonObject result;
-    result.copy(m_value, var::JsonValue::IsDeepCopy::yes);
+  json::JsonObject to_object() const {
+    json::JsonObject result;
+    result.copy(m_value, json::JsonValue::IsDeepCopy::yes);
     return result;
   }
 
-  ChartJsOptions &set_property(var::StringView key,
-                               const var::JsonValue &value) {
+  ChartJsOptions &set_property(const char *key, const json::JsonValue &value) {
     m_value.insert(key, value);
     return *this;
   }
@@ -520,20 +519,19 @@ public:
     return *this;
   }
 
-  static ChartJsOptions create_time(var::StringView unit,
-                                    var::StringView format) {
+  static ChartJsOptions create_time(const char *unit, var::StringView format) {
     ChartJsOptions result;
-    result.set_property("unit", var::JsonString(unit));
+    result.set_property("unit", json::JsonString(unit));
     ChartJsOptions display_format;
-    display_format.set_property(unit, var::JsonString(format));
+    display_format.set_property(unit, json::JsonString(format));
     result.set_property("displayFormats", display_format.object());
     return result;
   }
 
-  const var::JsonObject &object() { return m_value; }
+  const json::JsonObject &object() { return m_value; }
 
 private:
-  var::JsonObject m_value;
+  json::JsonObject m_value;
 };
 
 class ChartJs {
@@ -549,9 +547,9 @@ public:
     type_scatter,
   };
 
-  var::JsonObject to_object() const {
-    var::JsonObject result;
-    result.insert("type", var::JsonString(convert_type_to_string(m_type)));
+  json::JsonObject to_object() const {
+    json::JsonObject result;
+    result.insert("type", json::JsonString(convert_type_to_string(m_type)));
 
     result.insert("options", options().to_object());
 
