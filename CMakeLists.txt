@@ -10,59 +10,7 @@ include(sos-sdk)
 
 include(targets/JsonAPI)
 
-set(LOCAL_NAME ChartAPI)
-project(${LOCAL_NAME} CXX)
+project(ChartAPI CXX)
 
-sos_sdk_add_subdirectory(PRIVATE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src)
-sos_sdk_add_subdirectory(INTERFACE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/include)
-
-
-
-sos_sdk_library_target(RELEASE ${LOCAL_NAME} "" release ${SOS_ARCH})
-
-add_library(${RELEASE_TARGET} STATIC)
-
-set_property(TARGET ${RELEASE_TARGET} PROPERTY CXX_STANDARD 17)
-
-target_sources(${RELEASE_TARGET}
-	PUBLIC
-	PRIVATE
-	${INTERFACE_SOURCES}
-	${PRIVATE_SOURCES}
-	)
-
-target_compile_definitions(${RELEASE_TARGET}
-	PUBLIC
-	PRIVATE
-	)
-
-target_compile_options(${RELEASE_TARGET}
-	PRIVATE
-	-Os
-	)
-
-
-target_include_directories(${RELEASE_TARGET}
-	PUBLIC
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-	$<INSTALL_INTERFACE:include/${LOCAL_NAME}>
-	PRIVATE
-	)
-
-
-set(LIBRARIES JsonAPI)
-
-
-install(DIRECTORY include/ DESTINATION include/${LOCAL_NAME} PATTERN CMakelists.txt EXCLUDE)
-
-option(BUILD_DEBUG "Build debug version of library" OFF)
-if(BUILD_DEBUG)
-sos_sdk_library_target(DEBUG ${LOCAL_NAME} "${LIB_OPTION}" debug ${SOS_ARCH})
-add_library(${DEBUG_TARGET} STATIC)
-sos_sdk_copy_target(${RELEASE_TARGET} ${DEBUG_TARGET})
-sos_sdk_library_add_arch_targets("${DEBUG_OPTIONS}" ${SOS_ARCH} "${LIBRARIES}")
-endif()
-
-#sos_sdk_library("${RELEASE_OPTIONS}")
-sos_sdk_library_add_arch_targets("${RELEASE_OPTIONS}" ${SOS_ARCH} "${LIBRARIES}")
-
+add_subdirectory(library library)
+add_subdirectory(tests tests)
