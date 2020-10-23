@@ -10,36 +10,31 @@ namespace chart {
 
 class ChartJsFlags {
 public:
-  enum positions {
-    position_top,
-    position_left,
-    position_bottom,
-    position_right
-  };
+  enum class Position { top, left, bottom, right };
 
-  static var::StringView position_to_string(enum positions value) {
+  static var::StringView position_to_string(Position value) {
     switch (value) {
-    case position_top:
+    case Position::top:
       return "top";
-    case position_left:
+    case Position::left:
       return "left";
-    case position_bottom:
+    case Position::bottom:
       return "bottom";
-    case position_right:
+    case Position::right:
       return "right";
     }
     return "left";
   }
 
-  enum aligns { align_start, align_center, align_end };
+  enum class Align { start, center, end };
 
-  static var::StringView align_to_string(enum aligns value) {
+  static var::StringView align_to_string(Align value) {
     switch (value) {
-    case align_start:
+    case Align::start:
       return "start";
-    case align_center:
+    case Align::center:
       return "center";
-    case align_end:
+    case Align::end:
       return "end";
     }
     return "left";
@@ -159,8 +154,8 @@ public:
   }
 
 private:
-  API_AC(ChartJsStringDataPoint, var::String, x);
-  API_AC(ChartJsStringDataPoint, var::String, y);
+  API_AS(ChartJsStringDataPoint, x);
+  API_AS(ChartJsStringDataPoint, y);
 };
 
 class ChartJsIntegerDataPoint {
@@ -267,7 +262,7 @@ private:
   API_AF(ChartJsDataSet, enum border_join_styles, hover_border_join_style,
          border_join_style_undefined);
   API_AF(ChartJsDataSet, float, hover_border_width, HUGE_VALF);
-  API_AC(ChartJsDataSet, var::String, label);
+  API_AS(ChartJsDataSet, label);
   API_AF(ChartJsDataSet, float, line_tension, 0.4f);
   API_AF(ChartJsDataSet, int, order, 0);
   API_AC(ChartJsDataSet, ChartJsColor, point_background_color);
@@ -284,8 +279,8 @@ private:
   API_AB(ChartJsDataSet, show_line, true);
   API_AB(ChartJsDataSet, span_gaps, true);
   API_AF(ChartJsDataSet, enum stepped_lines, stepped_line, stepped_line_false);
-  API_AC(ChartJsDataSet, var::String, x_axis_id);
-  API_AC(ChartJsDataSet, var::String, y_axis_id);
+  API_AS(ChartJsDataSet, x_axis_id);
+  API_AS(ChartJsDataSet, y_axis_id);
 
   enum types m_type = type_string;
   var::Vector<json::JsonValue> m_data;
@@ -464,7 +459,7 @@ public:
 
 private:
   API_AB(ChartJsTitle, display, true);
-  API_AF(ChartJsTitle, enum positions, position, position_top);
+  API_AF(ChartJsTitle, Position, position, Position::top);
   API_AF(ChartJsTitle, int, font_size, 12);
   API_AC(ChartJsTitle, var::String, text);
 };
@@ -486,8 +481,8 @@ private:
   API_AB(ChartJsLegend, full_width, true);
   API_AB(ChartJsLegend, reverse, false);
   API_AB(ChartJsLegend, right_to_left, false);
-  API_AF(ChartJsLegend, enum positions, position, position_top);
-  API_AF(ChartJsLegend, enum aligns, align, align_center);
+  API_AF(ChartJsLegend, Position, position, Position::top);
+  API_AF(ChartJsLegend, Align, align, Align::center);
 };
 
 class ChartJsOptions {
