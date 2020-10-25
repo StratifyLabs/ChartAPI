@@ -156,7 +156,7 @@ json::JsonObject ChartJsDataSet::to_object() const {
                 json::JsonString(get_cubic_interpolation_mode_string(
                     cubic_interpolation_mode())));
   // clip
-  result.insert("fill", is_fill());
+  result.insert_bool("fill", is_fill());
 
   if (hover_background_color().is_valid()) {
     result.insert("hoverBackgroundColor",
@@ -226,16 +226,16 @@ json::JsonObject ChartJsDataSet::to_object() const {
   result.insert("pointStyle",
                 json::JsonString(get_point_style_string(point_style())));
 
-  result.insert("showLine", is_show_line());
-  result.insert("spanGaps", is_span_gaps());
+  result.insert_bool("showLine", is_show_line());
+  result.insert_bool("spanGaps", is_span_gaps());
 
   {
     const var::StringView stepped_line_value =
         get_stepped_line_string(stepped_line());
     if (stepped_line_value == "true") {
-      result.insert("steppedLine", true);
+      result.insert_bool("steppedLine", true);
     } else if (stepped_line_value == "false") {
-      result.insert("steppedLine", false);
+      result.insert_bool("steppedLine", false);
     } else {
       result.insert("steppedLine", json::JsonString(stepped_line_value));
     }

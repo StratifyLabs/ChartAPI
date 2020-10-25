@@ -350,13 +350,13 @@ public:
 
   json::JsonObject to_object() const {
     return json::JsonObject()
-        .insert("display", is_display())
+        .insert_bool("display", is_display())
         .insert("labelString", json::JsonString(label()));
   }
 
 private:
   API_AB(ChartJsScaleLabel, display, true);
-  API_AC(ChartJsScaleLabel, var::String, label);
+  API_AS(ChartJsScaleLabel, label);
 };
 
 class ChartJsAxis {
@@ -365,7 +365,7 @@ public:
 
   json::JsonObject to_object() const {
     json::JsonObject result;
-    result.insert("display", is_display())
+    result.insert_bool("display", is_display())
         .insert("type", json::JsonString(type_to_string(type())))
         .insert("weight", json::JsonInteger(weight()));
 
@@ -378,7 +378,7 @@ public:
     }
 
     if (is_stacked()) {
-      result.insert("stacked", is_stacked());
+      result.insert_bool("stacked", is_stacked());
     }
 
     return result;
@@ -389,7 +389,7 @@ private:
   API_AF(ChartJsAxis, int, weight, 0);
   API_AC(ChartJsAxis, ChartJsAxisTicks, ticks);
   API_AC(ChartJsAxis, ChartJsScaleLabel, scale_label);
-  API_AC(ChartJsAxis, var::String, id);
+  API_AS(ChartJsAxis, id);
   API_AB(ChartJsAxis, stacked, false);
   API_AC(ChartJsAxis, enum types, type);
 
@@ -451,7 +451,7 @@ class ChartJsTitle : public ChartJsFlags {
 public:
   json::JsonObject to_object() const {
     return json::JsonObject()
-        .insert("display", is_display())
+        .insert_bool("display", is_display())
         .insert("fontSize", json::JsonInteger(font_size()))
         .insert("position", json::JsonString(position_to_string(position())))
         .insert("text", json::JsonString(text()));
@@ -461,7 +461,7 @@ private:
   API_AB(ChartJsTitle, display, true);
   API_AF(ChartJsTitle, Position, position, Position::top);
   API_AF(ChartJsTitle, int, font_size, 12);
-  API_AC(ChartJsTitle, var::String, text);
+  API_AS(ChartJsTitle, text);
 };
 
 class ChartJsLegend : public ChartJsFlags {
@@ -470,10 +470,10 @@ public:
     return json::JsonObject()
         .insert("align", json::JsonString(align_to_string(align())))
         .insert("position", json::JsonString(position_to_string(position())))
-        .insert("display", is_display())
-        .insert("rtl", is_right_to_left())
-        .insert("reverse", is_reverse())
-        .insert("fullWidth", is_full_width());
+        .insert_bool("display", is_display())
+        .insert_bool("rtl", is_right_to_left())
+        .insert_bool("reverse", is_reverse())
+        .insert_bool("fullWidth", is_full_width());
   }
 
 private:
