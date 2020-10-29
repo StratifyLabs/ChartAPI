@@ -188,46 +188,28 @@ class ChartJsDataSet {
 public:
   ChartJsDataSet() {}
 
-  enum types { type_string, type_real, type_object };
+  enum class Type { string, real, object };
 
-  enum point_styles {
-    point_style_circle,
-    point_style_cross,
-    point_style_cross_rot,
-    point_style_dash,
-    point_style_line,
-    point_style_rectangle,
-    point_style_rectangle_rounded,
-    point_style_rectangle_rot,
-    point_style_star,
-    point_style_triangle
+  enum class PointStyle {
+    circle,
+    cross,
+    cross_rot,
+    dash,
+    line,
+    rectangle,
+    rectangle_rounded,
+    rectangle_rot,
+    star,
+    triangle
   };
 
-  enum cubic_interpolation_modes {
-    cubic_interpolation_mode_default,
-    cubic_interpolation_mode_monotone
-  };
+  enum class CubicInterpolationMode { default_, monotone };
 
-  enum stepped_lines {
-    stepped_line_true,
-    stepped_line_false,
-    stepped_line_before,
-    stepped_line_after,
-    stepped_line_middle
-  };
+  enum class SteppedLine { no, yes, before, after, middle };
 
-  enum border_join_styles {
-    border_join_style_undefined,
-    border_join_style_bevel,
-    border_join_style_round,
-    border_join_style_miter
-  };
+  enum class BorderJoinStyle { undefined, bevel, round, miter };
 
-  enum border_cap_styles {
-    border_cap_style_butt,
-    border_cap_style_round,
-    border_cap_style_square
-  };
+  enum class BorderCapStyle { butt, round, square };
 
   ChartJsDataSet &append(const json::JsonValue &value) {
     data().push_back(value);
@@ -241,26 +223,26 @@ public:
 
 private:
   API_AC(ChartJsDataSet, ChartJsColor, background_color);
-  API_AF(ChartJsDataSet, enum border_cap_styles, border_cap_style,
-         border_cap_style_butt);
+  API_AF(ChartJsDataSet, BorderCapStyle, border_cap_style,
+         BorderCapStyle::butt);
   API_AC(ChartJsDataSet, ChartJsColor, border_color);
   API_AC(ChartJsDataSet, var::Vector<s32>, border_dash_list);
   API_AF(ChartJsDataSet, float, border_dash_offset, 0.0f);
-  API_AF(ChartJsDataSet, enum border_join_styles, border_join_style,
-         border_join_style_miter);
+  API_AF(ChartJsDataSet, BorderJoinStyle, border_join_style,
+         BorderJoinStyle::miter);
   API_AF(ChartJsDataSet, float, border_width, 3.0f);
-  API_AF(ChartJsDataSet, enum cubic_interpolation_modes,
-         cubic_interpolation_mode, cubic_interpolation_mode_default);
+  API_AF(ChartJsDataSet, CubicInterpolationMode, cubic_interpolation_mode,
+         CubicInterpolationMode::default_);
   API_AB(ChartJsDataSet, fill, true);
   // clip
   API_AC(ChartJsDataSet, ChartJsColor, hover_background_color);
-  API_AF(ChartJsDataSet, enum border_cap_styles, hover_border_cap_style,
-         border_cap_style_butt);
+  API_AF(ChartJsDataSet, BorderCapStyle, hover_border_cap_style,
+         BorderCapStyle::butt);
   API_AC(ChartJsDataSet, ChartJsColor, hover_border_color);
   API_AC(ChartJsDataSet, var::Vector<s32>, hover_border_dash_list);
   API_AF(ChartJsDataSet, float, hover_border_dash_offset, 0.0f);
-  API_AF(ChartJsDataSet, enum border_join_styles, hover_border_join_style,
-         border_join_style_undefined);
+  API_AF(ChartJsDataSet, BorderJoinStyle, hover_border_join_style,
+         BorderJoinStyle::undefined);
   API_AF(ChartJsDataSet, float, hover_border_width, HUGE_VALF);
   API_AS(ChartJsDataSet, label);
   API_AF(ChartJsDataSet, float, line_tension, 0.4f);
@@ -275,24 +257,22 @@ private:
   API_AF(ChartJsDataSet, float, point_hover_radius, 4.0f);
   API_AF(ChartJsDataSet, float, point_radius, 3.0f);
   API_AF(ChartJsDataSet, float, point_rotation, 0.0f);
-  API_AF(ChartJsDataSet, enum point_styles, point_style, point_style_circle);
+  API_AF(ChartJsDataSet, PointStyle, point_style, PointStyle::circle);
   API_AB(ChartJsDataSet, show_line, true);
   API_AB(ChartJsDataSet, span_gaps, true);
-  API_AF(ChartJsDataSet, enum stepped_lines, stepped_line, stepped_line_false);
+  API_AF(ChartJsDataSet, SteppedLine, stepped_line, SteppedLine::no);
   API_AS(ChartJsDataSet, x_axis_id);
   API_AS(ChartJsDataSet, y_axis_id);
 
-  enum types m_type = type_string;
+  Type m_type = Type::string;
   var::Vector<json::JsonValue> m_data;
 
-  static var::StringView get_point_style_string(enum point_styles value);
+  static var::StringView get_point_style_string(PointStyle value);
   static var::StringView
-  get_cubic_interpolation_mode_string(enum cubic_interpolation_modes value);
-  static var::StringView get_stepped_line_string(enum stepped_lines value);
-  static var::StringView
-  get_border_join_style_string(enum border_join_styles value);
-  static var::StringView
-  get_border_cap_style_string(enum border_cap_styles value);
+  get_cubic_interpolation_mode_string(CubicInterpolationMode value);
+  static var::StringView get_stepped_line_string(SteppedLine value);
+  static var::StringView get_border_join_style_string(BorderJoinStyle value);
+  static var::StringView get_border_cap_style_string(BorderCapStyle value);
 };
 
 class ChartJsData {
@@ -361,7 +341,7 @@ private:
 
 class ChartJsAxis {
 public:
-  enum types { type_linear, type_logarithmic, type_category, type_time };
+  enum class Type { linear, logarithmic, category, time };
 
   json::JsonObject to_object() const {
     json::JsonObject result;
@@ -391,17 +371,17 @@ private:
   API_AC(ChartJsAxis, ChartJsScaleLabel, scale_label);
   API_AS(ChartJsAxis, id);
   API_AB(ChartJsAxis, stacked, false);
-  API_AC(ChartJsAxis, enum types, type);
+  API_AC(ChartJsAxis, Type, type);
 
-  static var::StringView type_to_string(enum types value) {
+  static var::StringView type_to_string(Type value) {
     switch (value) {
-    case type_linear:
+    case Type::linear:
       return "linear";
-    case type_logarithmic:
+    case Type::logarithmic:
       return "logarithmic";
-    case type_category:
+    case Type::category:
       return "category";
-    case type_time:
+    case Type::time:
       return "time";
     }
     return "linear";
@@ -533,13 +513,13 @@ class ChartJs {
 public:
   ChartJs();
 
-  enum types {
-    type_line,
-    type_bar,
-    type_doughnut,
-    type_pie,
-    type_radar,
-    type_scatter,
+  enum class Type {
+    line,
+    bar,
+    doughnut,
+    pie,
+    radar,
+    scatter,
   };
 
   json::JsonObject to_object() const {
@@ -560,12 +540,12 @@ public:
   const ChartJsOptions &options() const { return m_options; }
 
 private:
-  API_AF(ChartJs, enum types, type, type_line);
+  API_AF(ChartJs, Type, type, Type::line);
 
   ChartJsData m_data;
   ChartJsOptions m_options;
 
-  static var::StringView convert_type_to_string(enum types value);
+  static var::StringView convert_type_to_string(Type value);
 };
 
 } // namespace chart

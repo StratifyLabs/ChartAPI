@@ -27,102 +27,100 @@ ChartJsColor::ChartJsColor(StringView hex_code) {
                .to_unsigned_long(StringView::Base::hexidecimal);
 }
 
-var::StringView ChartJs::convert_type_to_string(enum types value) {
+var::StringView ChartJs::convert_type_to_string(Type value) {
   switch (value) {
-  case type_line:
+  case Type::line:
     return "line";
-  case type_bar:
+  case Type::bar:
     return "bar";
-  case type_doughnut:
+  case Type::doughnut:
     return "doughnut";
-  case type_pie:
+  case Type::pie:
     return "pie";
-  case type_radar:
+  case Type::radar:
     return "radar";
-  case type_scatter:
+  case Type::scatter:
     return "scatter";
   }
   return "line";
 }
 
-var::StringView
-ChartJsDataSet::get_point_style_string(enum point_styles value) {
+var::StringView ChartJsDataSet::get_point_style_string(PointStyle value) {
   switch (value) {
-  case point_style_circle:
+  case PointStyle::circle:
     return "circle";
-  case point_style_cross:
+  case PointStyle::cross:
     return "cross";
-  case point_style_cross_rot:
+  case PointStyle::cross_rot:
     return "crossRot";
-  case point_style_dash:
+  case PointStyle::dash:
     return "dash";
-  case point_style_line:
+  case PointStyle::line:
     return "line";
-  case point_style_rectangle:
+  case PointStyle::rectangle:
     return "rect";
-  case point_style_rectangle_rounded:
+  case PointStyle::rectangle_rounded:
     return "rectRounded";
-  case point_style_rectangle_rot:
+  case PointStyle::rectangle_rot:
     return "rectRot";
-  case point_style_star:
+  case PointStyle::star:
     return "star";
-  case point_style_triangle:
+  case PointStyle::triangle:
     return "triangle";
   }
   return "circle";
 }
 
 var::StringView ChartJsDataSet::get_cubic_interpolation_mode_string(
-    enum cubic_interpolation_modes value) {
+    CubicInterpolationMode value) {
   switch (value) {
-  case cubic_interpolation_mode_default:
+  case CubicInterpolationMode::default_:
     return "default";
-  case cubic_interpolation_mode_monotone:
+  case CubicInterpolationMode::monotone:
     return "monotone";
   }
   return "default";
 }
 
-var::StringView
-ChartJsDataSet::get_stepped_line_string(enum stepped_lines value) {
+var::StringView ChartJsDataSet::get_stepped_line_string(SteppedLine value) {
   switch (value) {
-  case stepped_line_true:
+  case SteppedLine::yes:
     return "true";
-  case stepped_line_false:
+  case SteppedLine::no:
     return "false";
-  case stepped_line_before:
+  case SteppedLine::before:
     return "before";
-  case stepped_line_after:
+  case SteppedLine::after:
     return "after";
-  case stepped_line_middle:
+  case SteppedLine::middle:
     return "middle";
   }
   return "true";
 }
 
 var::StringView
-ChartJsDataSet::get_border_join_style_string(enum border_join_styles value) {
+ChartJsDataSet::get_border_join_style_string(BorderJoinStyle value) {
   switch (value) {
-  case border_join_style_undefined:
+  case BorderJoinStyle::undefined:
     return "undefined";
-  case border_join_style_bevel:
+  case BorderJoinStyle::bevel:
     return "bevel";
-  case border_join_style_round:
+  case BorderJoinStyle::round:
     return "round";
-  case border_join_style_miter:
+  case BorderJoinStyle::miter:
     return "miter";
   }
   return "miter";
 }
 
 var::StringView
-ChartJsDataSet::get_border_cap_style_string(enum border_cap_styles value) {
+ChartJsDataSet::get_border_cap_style_string(BorderCapStyle value) {
   switch (value) {
-  case border_cap_style_butt:
+  case BorderCapStyle::butt:
     return "butt";
-  case border_cap_style_round:
+  case BorderCapStyle::round:
     return "round";
-  case border_cap_style_square:
+  case BorderCapStyle::square:
     return "round";
   }
   return "butt";
@@ -180,7 +178,7 @@ json::JsonObject ChartJsDataSet::to_object() const {
                   json::JsonReal(hover_border_dash_offset()));
   }
 
-  if (hover_border_join_style() != border_join_style_undefined) {
+  if (hover_border_join_style() != BorderJoinStyle::undefined) {
     result.insert("hoverBorderJoinStyle",
                   json::JsonString(
                       get_border_join_style_string(hover_border_join_style())));
