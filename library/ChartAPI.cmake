@@ -1,4 +1,5 @@
 
-include(targets/JsonAPI)
-
-sos_sdk_include_target(ChartAPI "${STRATIFYAPI_CONFIG_LIST}")
+if(NOT DEFINED IS_SDK)
+	include(JsonAPI)
+	sos_sdk_include_target(ChartAPI "${STRATIFYAPI_CONFIG_LIST}")
+endif()
