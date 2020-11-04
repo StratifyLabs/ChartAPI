@@ -14,17 +14,17 @@ ChartJsColor::ChartJsColor(StringView hex_code) {
   set_valid();
 
   m_red = hex_code.get_substring_with_length(2).to_unsigned_long(
-      String::Base::hexidecimal);
+      String::Base::hexadecimal);
 
   m_green = hex_code
                 .get_substring(
                     StringView::GetSubstring().set_position(2).set_length(2))
-                .to_unsigned_long(StringView::Base::hexidecimal);
+                .to_unsigned_long(StringView::Base::hexadecimal);
 
   m_blue = hex_code
                .get_substring(
                    StringView::GetSubstring().set_position(4).set_length(2))
-               .to_unsigned_long(StringView::Base::hexidecimal);
+               .to_unsigned_long(StringView::Base::hexadecimal);
 }
 
 var::StringView ChartJs::convert_type_to_string(Type value) {
