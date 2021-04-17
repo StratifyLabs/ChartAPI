@@ -133,14 +133,14 @@ json::JsonObject ChartJsDataSet::to_object() const {
 
   if (background_color().is_valid()) {
     result.insert("backgroundColor",
-                  json::JsonString(background_color().to_string()));
+                  json::JsonString(background_color().to_string().string_view()));
   }
 
   result.insert("borderCapStyle", json::JsonString(get_border_cap_style_string(
                                       border_cap_style())));
 
   if (border_color().is_valid()) {
-    result.insert("borderColor", json::JsonString(border_color().to_string()));
+    result.insert("borderColor", json::JsonString(border_color().to_string().string_view()));
   }
 
   if (border_dash_list().count()) {
@@ -160,7 +160,7 @@ json::JsonObject ChartJsDataSet::to_object() const {
 
   if (hover_background_color().is_valid()) {
     result.insert("hoverBackgroundColor",
-                  json::JsonString(hover_background_color().to_string()));
+                  json::JsonString(hover_background_color().to_string().string_view()));
   }
   result.insert(
       "hoverBorderCapStyle",
@@ -168,7 +168,7 @@ json::JsonObject ChartJsDataSet::to_object() const {
 
   if (hover_border_color().is_valid()) {
     result.insert("hoverBorderColor",
-                  json::JsonString(hover_border_color().to_string()));
+                  json::JsonString(hover_border_color().to_string().string_view()));
   }
 
   if (hover_border_dash_list().count()) {
@@ -199,12 +199,12 @@ json::JsonObject ChartJsDataSet::to_object() const {
 
   if (point_background_color().is_valid()) {
     result.insert("pointBackgroundColor",
-                  json::JsonString(point_background_color().to_string()));
+                  json::JsonString(point_background_color().to_string().string_view()));
   }
 
   if (point_border_color().is_valid()) {
     result.insert("pointBorderColor",
-                  json::JsonString(point_border_color().to_string()));
+                  json::JsonString(point_border_color().to_string().string_view()));
   }
 
   result.insert("pointBorderWidth", json::JsonReal(point_border_width()));
@@ -212,12 +212,12 @@ json::JsonObject ChartJsDataSet::to_object() const {
 
   if (point_hover_background_color().is_valid()) {
     result.insert("pointHoverBackgroundColor",
-                  json::JsonString(point_hover_background_color().to_string()));
+                  json::JsonString(point_hover_background_color().to_string().string_view()));
   }
 
   if (point_hover_border_color().is_valid()) {
     result.insert("pointHoverBorderColor",
-                  json::JsonString(point_hover_border_color().to_string()));
+                  json::JsonString(point_hover_border_color().to_string().string_view()));
   }
 
   result.insert("pointHoverRadius", json::JsonReal(point_hover_radius()));

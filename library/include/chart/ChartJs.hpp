@@ -75,8 +75,8 @@ public:
     return *this;
   }
 
-  var::String to_string() const {
-    return var::String().format("rgba(%d,%d,%d,%0.2f)", m_red, m_green, m_blue,
+  var::GeneralString to_string() const {
+    return var::GeneralString().format("rgba(%d,%d,%d,%0.2f)", m_red, m_green, m_blue,
                                 m_alpha * 1.0f / 255);
   }
 
